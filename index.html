@@ -1,385 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>McFarland PSC - Device Checklist</title>
+    <title>Omni Checklist Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Include the checklist data -->
+    <script src="checklists.js"></script>
     <style>
-        /* Custom Styles */
+        /* --- Base & Typography --- */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
-            color: #1e293b;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
         }
-        .header {
-            background-color: #334155;
-            color: #f8fafc;
+        .dark body {
+            background-color: #020617; /* slate-950 */
+            color: #cbd5e1; /* slate-300 */
         }
+        /* --- Professional Layout & Feel --- */
         .btn {
-             transition: all 0.3s ease;
+            @apply px-4 py-2 rounded-lg font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 transition-all duration-200 ease-in-out;
         }
         .btn-secondary {
-            background-color: #e2e8f0;
-            color: #334155;
-        }
-        .btn-secondary:hover {
-            background-color: #cbd5e1;
+            @apply bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 focus:ring-slate-500;
         }
         .btn-warning {
-            background-color: #f59e0b;
-            color: white;
-        }
-        .btn-warning:hover {
-            background-color: #d97706;
+            @apply bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500;
         }
         .btn-danger {
-            background-color: #dc2626;
-            color: white;
-        }
-        .btn-danger:hover {
-            background-color: #b91c1c;
+            @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
         }
         .device-card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            transition: all 0.2s ease-in-out;
-            border-left: 5px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
-        .device-card.checked {
-            background-color: #eef2ff;
-            border-left-color: #4f46e5;
+        .device-card:hover {
+            transform: translateY(-3px);
+            @apply shadow-xl;
         }
-        .sticky-footer {
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.85);
-        }
-        /* Custom checkbox */
+        /* --- Custom Checkbox from previous version --- */
         .custom-checkbox {
-            -webkit-appearance: none;
-            appearance: none;
-            background-color: #fff;
-            margin: 0;
-            font: inherit;
-            color: currentColor;
-            width: 1.75em;
-            height: 1.75em;
-            border: 0.15em solid #cbd5e1;
-            border-radius: 0.375rem;
-            transform: translateY(-0.075em);
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
+            -webkit-appearance: none; appearance: none; margin: 0; font: inherit; color: currentColor; width: 1.75em; height: 1.75em; border-radius: 0.375rem; transform: translateY(-0.075em); display: grid; place-content: center; cursor: pointer; transition: background-color 0.2s, border-color 0.2s;
+            @apply bg-white border-2 border-slate-300 dark:bg-slate-700 dark:border-slate-600;
         }
-        .custom-checkbox:checked {
-            background-color: #4f46e5;
-            border-color: #4f46e5;
-        }
-        .custom-checkbox::before {
-            content: "";
-            width: 1em;
-            height: 1em;
-            transform: scale(0);
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em white;
-            transform-origin: bottom left;
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        }
-        .custom-checkbox:checked::before {
-            transform: scale(1);
-        }
-        /* Progress Bar */
-        .progress-bar {
-            background-color: #4f46e5;
-            transition: width 0.5s ease-in-out;
-        }
-        /* Details/Summary for Accordion */
-        details > summary { list-style: none; cursor: pointer; }
+        .custom-checkbox:checked { @apply bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500; }
+        .custom-checkbox::before { content: ""; width: 1em; height: 1em; transform: scale(0); transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white; transform-origin: bottom left; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+        .custom-checkbox:checked::before { transform: scale(1); }
+
+        /* --- Details/Summary for Accordion --- */
+        details > summary { list-style: none; cursor: pointer; @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg; }
         details > summary::-webkit-details-marker { display: none; }
         .summary-arrow { transition: transform 0.2s; }
         details[open] .summary-arrow { transform: rotate(90deg); }
 
-        /* Modal Styles */
-        .modal-overlay {
-            transition: opacity 0.3s ease;
-        }
-        .modal-box {
-            transition: all 0.3s ease;
-        }
+        /* --- Utility --- */
+        .sort-icon { @apply inline-block w-4 h-4 ml-1 opacity-0 transition-opacity; }
+        [aria-sort] .sort-icon { @apply opacity-60; }
+        .building-link.active { @apply bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400; }
     </style>
 </head>
 <body class="antialiased">
-
-    <!-- Header Section -->
-    <header class="header shadow-md p-4 sticky top-0 z-20">
-        <div class="container mx-auto max-w-7xl">
-            <h1 class="text-2xl md:text-3xl font-bold text-center">McFarland Public Safety Center</h1>
-            <p class="text-center text-slate-300 text-sm md:text-base">Fire Alarm Device Checklist</p>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto max-w-7xl p-4 md:p-6 pb-24">
-
-        <!-- Progress Bar and Stats -->
-        <div class="mb-6 bg-white p-4 rounded-xl shadow-sm">
-             <div id="progress-stats" class="text-center text-slate-600 mb-2 font-medium">0 / 0 Devices Checked</div>
-             <div class="bg-slate-200 rounded-full overflow-hidden h-8">
-                <div id="progress-bar" class="progress-bar h-full rounded-full flex items-center justify-center text-white font-bold" style="width: 0%;">0%</div>
-             </div>
-        </div>
-
-        <!-- Controls: Search, Sort, and Actions -->
-        <div class="mb-6 bg-white p-4 rounded-xl shadow-sm sticky top-[105px] z-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                <div class="lg:col-span-2">
-                    <label for="search" class="block text-sm font-medium text-slate-600 mb-1">Search Devices</label>
-                    <input type="text" id="search" placeholder="E.g., BASEMENT SMOKE, 278, 3939..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+    <div class="flex flex-col lg:flex-row">
+        <!-- Main Content Area -->
+        <div class="flex-grow">
+            <!-- Header Section -->
+            <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800">
+                <div class="container mx-auto max-w-7xl flex items-center justify-between">
+                    <h1 id="main-header" class="text-xl md:text-2xl font-bold text-slate-800 dark:text-white truncate">Omni Technologies Checklist Hub</h1>
+                    <!-- Mobile Building Selector -->
+                    <div class="lg:hidden">
+                         <label for="checklist-select-mobile" class="sr-only">Select Building</label>
+                         <select id="checklist-select-mobile" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">-- Select a Building --</option>
+                         </select>
+                    </div>
                 </div>
-                <div>
-                    <label for="sortBy" class="block text-sm font-medium text-slate-600 mb-1">Sort By</label>
-                    <select id="sortBy" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="address">Address (Asc)</option>
-                        <option value="address-desc">Address (Desc)</option>
-                        <option value="loop">Loop</option>
-                        <option value="model">Model</option>
-                        <option value="deviceType">Device Type</option>
-                    </select>
+            </header>
+
+            <!-- Workspace -->
+            <div id="content-area" class="container mx-auto max-w-7xl p-4 md:p-6 pb-24">
+                <div id="welcome-message" class="text-center py-20">
+                    <svg class="mx-auto h-12 w-12 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-12a2.25 2.25 0 01-2.25-2.25V3M16.5 5.25v-1.5m0 1.5v1.5m0 0v1.5m0 0v1.5m0 0v1.5m0 0v1.5m-15-3.375a48.474 48.474 0 0115 0" /></svg>
+                    <h2 class="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-200">Welcome, Inspector!</h2>
+                    <p class="mt-1 text-base text-slate-500 dark:text-slate-400">Select a building from the list to begin.</p>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                     <button id="undo-btn" class="w-full btn btn-secondary px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Undo</button>
-                     <button id="clear-all-btn" class="w-full btn btn-warning px-4 py-2 rounded-lg font-semibold">Clear All</button>
-                </div>
+
+                <main id="main-content" class="hidden">
+                    <!-- Progress & Stats -->
+                    <div class="mb-6 bg-white dark:bg-slate-800/50 p-4 rounded-xl shadow-lg">
+                        <div id="progress-stats" class="text-center text-slate-600 dark:text-slate-300 mb-2 font-medium">0 / 0 Devices Checked</div>
+                        <div class="bg-slate-200 dark:bg-slate-700 rounded-full h-4">
+                            <div id="progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="mb-6 bg-white dark:bg-slate-800/50 p-4 rounded-xl shadow-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:flex gap-4 items-center">
+                            <div class="relative flex-grow">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3"><svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg></span>
+                                <input type="search" id="search" placeholder="Search devices..." class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div class="flex-shrink-0">
+                                <label for="sortBy" class="sr-only">Sort By</label>
+                                <select id="sortBy" class="w-full md:w-auto px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="address">Sort by Address (Asc)</option>
+                                    <option value="address-desc">Sort by Address (Desc)</option>
+                                    <option value="loop">Sort by Loop</option>
+                                    <option value="model">Sort by Model</option>
+                                    <option value="deviceType">Sort by Type</option>
+                                </select>
+                            </div>
+                            <div class="flex-shrink-0 grid grid-cols-2 gap-2">
+                                 <button id="undo-btn" title="Undo Last Check" class="btn btn-secondary flex items-center justify-center gap-2">
+                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.793 2.232a.75.75 0 011.06 0l3.5 3.5a.75.75 0 01-1.06 1.06L9 4.56v10.94a.75.75 0 01-1.5 0V4.56L5.28 6.793a.75.75 0 01-1.06-1.06l3.5-3.5zM12.25 18a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H13a.75.75 0 01-.75-.75z" clip-rule="evenodd" /></svg>
+                                     Undo
+                                </button>
+                                 <button id="clear-all-btn" title="Clear All Checks" class="btn btn-warning flex items-center justify-center gap-2">
+                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg>
+                                     Clear
+                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Devices -->
+                    <details id="completed-section" class="mb-6" open>
+                        <summary class="p-2 -ml-2 flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                <svg class="summary-arrow h-5 w-5 text-slate-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" /></svg>
+                                Completed Devices
+                                <span id="completed-count" class="bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400 font-bold text-sm px-3 py-1 rounded-full">0</span>
+                            </h2>
+                        </summary>
+                        <div id="completed-device-list" class="pt-2 grid grid-cols-1 gap-4"></div>
+                    </details>
+
+                    <!-- Remaining Devices -->
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">Remaining Devices</h2>
+                    <div id="device-list" class="grid grid-cols-1 gap-4"></div>
+                </main>
             </div>
         </div>
 
-        <!-- Collapsible Completed Devices Section -->
-        <details id="completed-section" class="bg-white rounded-xl shadow-sm mb-6" open>
-            <summary class="p-4 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <svg class="summary-arrow h-5 w-5 text-slate-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    <h2 class="text-xl font-bold text-slate-700">Completed Devices</h2>
+        <!-- Right Sidebar for Buildings -->
+        <aside class="w-full lg:w-80 lg:flex-shrink-0 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 hidden lg:block">
+            <div class="p-6 sticky top-0 h-screen overflow-y-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <svg class="h-8 w-8 text-indigo-600 dark:text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6.375a.75.75 0 01.75.75v3.75a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75V7.5a.75.75 0 01.75-.75z" /></svg>
+                    <h2 class="text-lg font-bold">Building Checklists</h2>
                 </div>
-                <span id="completed-count" class="bg-indigo-100 text-indigo-700 font-bold text-sm px-3 py-1 rounded-full">0</span>
-            </summary>
-            <div id="completed-device-list" class="p-4 pt-0 grid grid-cols-1 gap-4">
-                <!-- Completed devices will be moved here -->
+                <nav id="building-list-desktop" class="space-y-1"></nav>
             </div>
-        </details>
-
-        <!-- Unchecked Device List Container -->
-        <h2 class="text-xl font-bold text-slate-700 mb-4">Remaining Devices</h2>
-        <div id="device-list" class="grid grid-cols-1 gap-4">
-            <!-- Unchecked devices will be rendered here -->
-        </div>
-
-    </main>
+        </aside>
+    </div>
     
-    <!-- Clear All Confirmation Modal -->
-    <div id="clear-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 modal-overlay opacity-0 pointer-events-none">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm modal-box scale-95">
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Are you sure?</h3>
-            <p class="text-slate-600 mb-6">This will uncheck all devices. This action cannot be undone.</p>
+    <!-- Modal -->
+    <div id="clear-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 modal-overlay opacity-0 pointer-events-none">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-sm modal-box scale-95">
+            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Are you sure?</h3>
+            <p class="text-slate-600 dark:text-slate-300 mb-6">This will uncheck all devices for this building. This action cannot be undone.</p>
             <div class="grid grid-cols-2 gap-4">
-                <button id="cancel-clear-btn" class="btn btn-secondary font-semibold py-2 rounded-lg">Cancel</button>
-                <button id="confirm-clear-btn" class="btn btn-danger font-semibold py-2 rounded-lg">Confirm Clear</button>
+                <button id="cancel-clear-btn" class="btn btn-secondary">Cancel</button>
+                <button id="confirm-clear-btn" class="btn btn-danger">Confirm & Clear</button>
             </div>
         </div>
     </div>
-
-
-    <!-- Sticky Footer for Previous Device -->
-    <footer id="previous-device-footer" class="sticky bottom-0 left-0 right-0 p-3 border-t border-slate-200 sticky-footer hidden z-20">
+    
+    <!-- Footer -->
+    <footer id="previous-device-footer" class="sticky bottom-0 left-0 right-0 p-3 border-t border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hidden z-20">
         <div class="container mx-auto max-w-7xl text-center">
-            <p class="text-sm text-slate-600 font-medium">Last Checked: <span id="previous-device-text" class="font-bold text-indigo-700"></span></p>
+            <p class="text-sm text-slate-600 dark:text-slate-300 font-medium">Last Checked: <span id="previous-device-text" class="font-bold text-indigo-600 dark:text-indigo-400"></span></p>
         </div>
     </footer>
 
     <script>
-        // --- DATA FROM PDF ---
-        const devices = [
-            // Detectors
-            { loop: 1, address: 1, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939747909', messages: 'BASEMENT SMOKE ABOVE FACP' },
-            { loop: 1, address: 2, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3831067556', messages: 'BASEMENT HEAT BY SPRINK PIPING' },
-            { loop: 1, address: 3, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828858723', messages: 'BASEMENT HEAT MECHANICAL RM' },
-            { loop: 1, address: 4, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754204', messages: 'BASEMENT SMOKE ELEVATOR SMOKE' },
-            { loop: 1, address: 5, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828858570', messages: 'BASEMENT HEAT OUTSIDE PANEL RM' },
-            { loop: 1, address: 6, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828849349', messages: 'BASEMENT HEAT ABOVE PANEL' },
-            { loop: 1, address: 7, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828845501', messages: 'BASEMENT HEAT MIDDLE/STAIRWELL B' },
-            { loop: 1, address: 8, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828862416', messages: 'BASEMENT HEAT FAR MIDDLE/STAIR A' },
-            { loop: 1, address: 9, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828845457', messages: 'BASEMENT HEAT NORTH/STAIRWELL A' },
-            { loop: 1, address: 10, model: 'SD', deviceType: 'Duct Supervisory Latching', serialNumber: '3969261901', messages: 'APPATURE BAY MEZ DUCT DETECTOR' },
-            { loop: 1, address: 11, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939777975', messages: 'PENTHOUSE SMOKE ABOVE BOSCH DIALER' },
-            { loop: 1, address: 12, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754365', messages: 'SOUTH STAIRWELL SMOKE DETECTOR' },
-            { loop: 1, address: 13, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939647735', messages: 'OUTSIDE SOUTH STAIR NEXT TO EXTERIOR DR' },
-            { loop: 1, address: 14, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939753535', messages: '1ST FLOOR SMOKE CORRIDOR TO STAIR B' },
-            { loop: 1, address: 15, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939753511', messages: '1ST FLOOR SMOKE S/E APP BAY' },
-            { loop: 1, address: 16, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754167', messages: '1ST FLOOR SMOKE ELEVATOR SMOKE' },
-            { loop: 1, address: 17, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939755119', messages: '1ST FLOOR SMOKE OUTSIDE ELEVATOR' },
-            { loop: 1, address: 18, model: 'SD', deviceType: 'Duct Supervisory Latching', serialNumber: '3912816448', messages: '1ST FLOOR DUCT STAIRWELL B' },
-            { loop: 1, address: 19, model: 'SD', deviceType: 'Duct Supervisory Latching', serialNumber: '3912816295', messages: '1ST FLOOR DUCT STAIRWELL B' },
-            { loop: 1, address: 20, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754259', messages: '1ST FLOOR SMOKE EAST APP BAY' },
-            { loop: 1, address: 21, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754297', messages: '1ST FLOOR SMOKE TRAINING STORAGE' },
-            { loop: 1, address: 22, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939755096', messages: '1ST FLOOR SMOKE MEDICAL STORAGE' },
-            { loop: 1, address: 23, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939755225', messages: '1ST FLOOR SMOKE IT/COMM ROOM' },
-            { loop: 1, address: 24, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754020', messages: '1ST FLOOR SMOKE JANITOR STORAGE' },
-            { loop: 1, address: 25, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939747961', messages: '1ST FLOOR SMOKE AV STORAGE ROOM' },
-            { loop: 1, address: 26, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754792', messages: '1ST FLOOR SMOKE COURT STORAGE' },
-            { loop: 1, address: 27, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939753962', messages: '1ST FLOOR POLICE SM EVIDENCE PROC. STOR.' },
-            { loop: 1, address: 28, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939753849', messages: '1ST FLOOR SMOKE POLICE IT CLOSET' },
-            { loop: 1, address: 29, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939753832', messages: '1ST FLOOR SMOKE POLICE SHOWER STRG' },
-            { loop: 1, address: 30, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939759575', messages: '1ST FLOOR SMOKE POLICE INVEST RM' },
-            { loop: 1, address: 31, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939758134', messages: '1ST FLOOR SMOKE POLICE P120 STORAGE' },
-            { loop: 1, address: 32, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754921', messages: '1ST FLOOR SMOKE POLICE MECH RM' },
-            { loop: 1, address: 33, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828859904', messages: '2ND FLOOR HEAT WEST MECH ROOM' },
-            { loop: 1, address: 34, model: 'HRS', deviceType: 'Heat ROR', serialNumber: '3828858587', messages: '2ND FLOOR HEAT WEST MECH ROOM' },
-            { loop: 1, address: 35, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939735654', messages: '2ND FLOOR SMOKE STIARWELL B' },
-            { loop: 1, address: 36, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754563', messages: 'TOP OF ELEVATOR SHAFT SMOKE' },
-            { loop: 1, address: 37, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754266', messages: '2ND FLOOR SMOKE OUTSIDE ELEVATOR' },
-            { loop: 1, address: 38, model: 'HFS', deviceType: 'Heat', serialNumber: '3622616017', messages: 'TOP OF ELEVATOR SHAFT HEAT' },
-            { loop: 1, address: 39, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939753870', messages: '2ND FLOOR SMOKE OUTSIDE DORM 12' },
-            { loop: 1, address: 40, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939776800', messages: '2ND FLOOR SMOKE DORM 12' },
-            { loop: 1, address: 41, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754525', messages: '2ND FLOOR SMOKE OUTSIDE DORM 11' },
-            { loop: 1, address: 42, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939736088', messages: '2ND FLOOR SMOKE DORM 11' },
-            { loop: 1, address: 43, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939754242', messages: '2ND FLOOR SMOKE DORM 10' },
-            { loop: 1, address: 44, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939778194', messages: '2ND FLOOR SMOKE DORM 9' },
-            { loop: 1, address: 45, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754945', messages: '2ND FLOOR SMOKE OUTSIDE DORM 8/9' },
-            { loop: 1, address: 46, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939754938', messages: '2ND FLOOR SMOKE DORM 8' },
-            { loop: 1, address: 47, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939754822', messages: '2ND FLOOR SMOKE DORM7' },
-            { loop: 1, address: 48, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939754044', messages: '2ND FLOOR SMOKE DORM 6' },
-            { loop: 1, address: 49, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939755102', messages: '2ND FLOOR SMOKE OUTSIDE DORM 5/6' },
-            { loop: 1, address: 50, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939747923', messages: '2ND FLOOR SMOKE DORM 5' },
-            { loop: 1, address: 51, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939753894', messages: '2ND FLOOR SMOKE DORM 4' },
-            { loop: 1, address: 52, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939755010', messages: '2ND FLOOR SMOKE OUTSIDE DORM 3/4' },
-            { loop: 1, address: 53, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939753856', messages: '2ND FLOOR SMOKE DORM 3' },
-            { loop: 1, address: 54, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939755065', messages: '2ND FLOOR SMOKE DORM 2' },
-            { loop: 1, address: 55, model: 'PS', deviceType: 'Supervisory Non-Latching', serialNumber: '3939754433', messages: '2ND FLOOR SMOKE DORM 1' },
-            { loop: 1, address: 56, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939754952', messages: '2ND FLOOR SMOKE OUTSIDE DORM 1' },
-            { loop: 1, address: 57, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939747619', messages: '2ND FLOOR SMOKE NORTH STAIRWELL' },
-            { loop: 1, address: 58, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3945817825', messages: '1ST FLOOR SMOKE ROLL DOWN DOOR' },
-            { loop: 1, address: 60, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3934208757', messages: '1ST FLOOR SMOKE ROLL DOWN DOOR' },
-            { loop: 1, address: 65, model: 'PS', deviceType: 'Smoke Verified', serialNumber: '3939758455', messages: 'SOUTH STAIRWELL ROOF ACCESS' },
-            { loop: 1, address: 80, model: 'IM', deviceType: 'Monitor', serialNumber: '3698974301', messages: 'ISOLATOR MODULE BASEMENT FACP' },
-            { loop: 1, address: 81, model: 'IM', deviceType: 'Monitor', serialNumber: '3698972574', messages: 'ISOLATOR MODULE 1ST FLOOR FACP' },
-            { loop: 1, address: 82, model: 'IM', deviceType: 'Monitor', serialNumber: '3698973106', messages: 'ISOLATOR MODULE 2ND FLOOR FACP' },
-            { loop: 1, address: 83, model: 'IM', deviceType: 'Monitor', serialNumber: '3698973830', messages: 'ISOLATOR MODULE 2ND FLR DORMS FACP' },
-            // Modules
-            { loop: 1, address: 126, model: '278', deviceType: 'Pull Station', serialNumber: '4899926137', messages: 'BASEMENT PULL STAIR B' },
-            { loop: 1, address: 127, model: '278', deviceType: 'Pull Station', serialNumber: '4899926700', messages: '2ND FLOOR PULL APP. BAY STORAGE' },
-            { loop: 1, address: 128, model: '278', deviceType: 'Pull Station', serialNumber: '4899925901', messages: 'BASEMENT PULL STAIRWELL A' },
-            { loop: 1, address: 129, model: 'CT2', deviceType: 'Supervisory Non-Latching', serialNumber: '4922818507', messages: 'ZONE #1 CONTROL VALVE ACTIVE' },
-            { loop: 1, address: 130, model: 'CT2', deviceType: 'Supervisory Non-Latching', serialNumber: '4922818514', messages: 'ZONE #2 CONTROL VALVE ACTIVE' },
-            { loop: 1, address: 131, model: 'CT2', deviceType: 'Water Flow NoDelay', serialNumber: '4922828643', messages: 'ZONE #1 WATEFLOW ACTIVE' },
-            { loop: 1, address: 132, model: 'CT2', deviceType: 'Water Flow NoDelay', serialNumber: '4922828650', messages: 'ZONE #2 WATERFLOW ACTIVE' },
-            { loop: 1, address: 133, model: 'CT1', deviceType: 'Supervisory Non-Latching', serialNumber: '4800233804', messages: 'BASEMENT ELEV EQUIP POWER MONITOR' },
-            { loop: 1, address: 134, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222515448', messages: 'BASEMENT ELEV EQUIP SHUNT TRIP' },
-            { loop: 1, address: 135, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222516698', messages: 'ELEVATOR MAIN RECALL' },
-            { loop: 1, address: 136, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222516971', messages: 'ELEVATOR SECONDARY RECALL' },
-            { loop: 1, address: 137, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222516896', messages: 'ELEVATOR HAT' },
-            { loop: 1, address: 138, model: '278', deviceType: 'Pull Station', serialNumber: '4899919580', messages: '1ST FLOOR PULL S/W APP BAY EXIT' },
-            { loop: 1, address: 139, model: '278', deviceType: 'Pull Station', serialNumber: '4899926144', messages: '1ST FLOOR PULL TURN-OUT GEAR EXIT' },
-            { loop: 1, address: 140, model: '278', deviceType: 'Pull Station', serialNumber: '4899919313', messages: '1ST FLOOR PULL ANTIQUE BAY EXIT' },
-            { loop: 1, address: 141, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222516957', messages: '1ST FLOOR DUCT CR AHU SHUTDOWN STAIR B' },
-            { loop: 1, address: 142, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222516841', messages: '1ST FLOOR DUCT CR AHU SHUTDOWN STAIR B' },
-            { loop: 1, address: 143, model: 'CT2', deviceType: 'Supervisory Non-Latching', serialNumber: '4925797465', messages: 'DIALER TROUBLE PENTHOUSE BOSCH' },
-            { loop: 1, address: 144, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5221949961', messages: 'AHU #3 SHUTDOWN' },
-            { loop: 1, address: 145, model: '278', deviceType: 'Pull Station', serialNumber: '4899927172', messages: '1ST FLOOR PULL STAIRWELL B' },
-            { loop: 1, address: 146, model: '278', deviceType: 'Pull Station', serialNumber: '4899919245', messages: '1ST FLOOR PULL STAIRWELL A' },
-            { loop: 1, address: 147, model: '278', deviceType: 'Pull Station', serialNumber: '4899928186', messages: '1ST FLOOR PULL SOUTH VESTIBULE' },
-            { loop: 1, address: 148, model: '278', deviceType: 'Pull Station', serialNumber: '4899928094', messages: '1ST FLOOR PULL COURT/TRAINING RM' },
-            { loop: 1, address: 149, model: '278', deviceType: 'Pull Station', serialNumber: '4899927097', messages: '1ST FLOOR PULL OUTSIDE INTERVIEW RM' },
-            { loop: 1, address: 150, model: '278', deviceType: 'Pull Station', serialNumber: '4899926434', messages: '1ST FLOOR PULL MAIN VESTIBULE' },
-            { loop: 1, address: 151, model: '278', deviceType: 'Pull Station', serialNumber: '4899926304', messages: '1ST FLOOR PULL POLICE VESTIBULE' },
-            { loop: 1, address: 152, model: '278', deviceType: 'Pull Station', serialNumber: '4899930905', messages: '1ST FLOOR PULL POLICE GARAGE 3/3' },
-            { loop: 1, address: 153, model: '278', deviceType: 'Pull Station', serialNumber: '4899919788', messages: '1ST FLOOR PULL POLICE GARAGE 2/3' },
-            { loop: 1, address: 154, model: '278', deviceType: 'Pull Station', serialNumber: '4899919849', messages: 'PENTHOUSE TO ROOF ACCESS' },
-            { loop: 1, address: 155, model: '278', deviceType: 'Pull Station', serialNumber: '4899926717', messages: '2ND FLOOR PULL STAIRWELL B' },
-            { loop: 1, address: 156, model: 'CT1', deviceType: 'Supervisory Non-Latching', serialNumber: '4800233392', messages: '2ND FLOOR RANGE HOOD NEED TO TEST' },
-            { loop: 1, address: 157, model: '278', deviceType: 'Pull Station', serialNumber: '4899927875', messages: '2ND FLOOR PULL KITCHEN TO APP BAY' },
-            { loop: 1, address: 158, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5221705154', messages: 'BASEMENT CR DOOR HOLDER' },
-            { loop: 1, address: 159, model: '278', deviceType: 'Pull Station', serialNumber: '4899931070', messages: '2ND FLOOR PULL STAIRWELL A' },
-            { loop: 1, address: 160, model: 'CT2', deviceType: 'Supervisory Non-Latching', serialNumber: '4921144881', messages: 'BACK FLOW SECONDARY CONTROL VALVE ACTIVE' },
-            { loop: 1, address: 161, model: 'CT2', deviceType: 'Supervisory Non-Latching', serialNumber: '4921144898', messages: 'BACKFLOW PRIMARY CONTROL VALVE ACTIVE' },
-            { loop: 1, address: 162, model: 'CT2', deviceType: 'Supervisory Non-Latching', serialNumber: '4925797472', messages: 'DIALER/NOT USED CT2 TO BOSCH CELL' },
-            { loop: 1, address: 163, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5225324788', messages: 'TROUBLE TO BOSCH PENTHOUSE FIRE' },
-            { loop: 1, address: 164, model: '278', deviceType: 'Pull Station', serialNumber: '4899918859', messages: '1ST FLOOR PULL POLICE GARAGE 1/3' },
-            { loop: 1, address: 165, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5223936815', messages: 'PENTHOUSE FIRE ALARM TO BOSCH DIALER' },
-            { loop: 1, address: 166, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222572595', messages: 'PENTHOUSE CO ALARM TO BOSCH DIALER' },
-            { loop: 1, address: 167, model: 'CT2', deviceType: 'Supervisory Latching', serialNumber: '4922828803', messages: '2ND FLOOR CO' },
-            { loop: 1, address: 168, model: 'CT2', deviceType: 'Supervisory Latching', serialNumber: '4922828810', messages: 'INPUT 2 FOR CO\'S NOT USED' },
-            { loop: 1, address: 180, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5221061762', messages: 'PENTHOUSE FIRE SUP TO BOSCH DIALER' },
-            { loop: 1, address: 181, model: 'CRR', deviceType: 'Relay Non-Silenceable', serialNumber: '5221663690', messages: 'SOUNDER BASE RELAY' },
-            { loop: 1, address: 182, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5216256135', messages: 'DOOR ACCESS RELAY' },
-            { loop: 1, address: 183, model: '278', deviceType: 'Pull Station', serialNumber: '4899919535', messages: 'BASEMENT PULL NEXT TO FACP' },
-            { loop: 1, address: 185, model: 'CC1S', deviceType: 'Genesis Audible Visible Silence', serialNumber: '5074492140', messages: '1ST FLOOR CC1S POLICE IT CLOSET' },
-            { loop: 1, address: 186, model: 'CR', deviceType: 'Relay Non-Silenceable', serialNumber: '5222516872', messages: 'FIRE ROLL UP DOOR' },
-            { loop: 1, address: 187, model: 'RM1', deviceType: 'Monitor', serialNumber: '5798621253', messages: 'SOUNDER BASE PWR MONITOR' },
-            { loop: 1, address: 188, model: 'CC1S', deviceType: 'Genesis Audible Visible Silence', serialNumber: '5066206359', messages: 'BPS RM F003 NEXT TO FACP' },
-            { loop: 1, address: 189, model: 'CC1S', deviceType: 'Genesis Audible Visible Silence', serialNumber: '5066291058', messages: 'FURTHEST FROM PANEL BPS RM F003' },
-            // Annunciators
-            { loop: 'N/A', address: 1, model: 'LCD C', deviceType: 'Annunciator', serialNumber: 'N/A', messages: 'MCFARLAND PUBLIC BLD FIRE PANEL NORMAL' },
-            { loop: 'N/A', address: 2, model: 'LCD C', deviceType: 'Annunciator', serialNumber: 'N/A', messages: 'MCFARLAND PUBLIC BLD FIRE PANEL NORMAL' },
-            // NAC
-            { loop: 'N/A', address: 1, model: 'Genesis', deviceType: 'NAC', serialNumber: 'N/A', messages: 'Bell Active' },
-            { loop: 'N/A', address: 2, model: 'Genesis', deviceType: 'NAC', serialNumber: 'N/A', messages: 'NAC 2' },
-            { loop: 'N/A', address: 3, model: 'Genesis', deviceType: 'NAC', serialNumber: 'N/A', messages: 'NAC 3' },
-            { loop: 'N/A', address: 4, model: 'Genesis', deviceType: 'NAC', serialNumber: 'N/A', messages: 'NAC 4' },
-        ];
-
-
-        // --- APPLICATION LOGIC ---
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM ELEMENTS ---
+            const checklistSelectMobile = document.getElementById('checklist-select-mobile');
+            const buildingListDesktop = document.getElementById('building-list-desktop');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const mainContent = document.getElementById('main-content');
+            const mainHeader = document.getElementById('main-header');
+            
             const deviceListContainer = document.getElementById('device-list');
             const completedDeviceListContainer = document.getElementById('completed-device-list');
             const searchInput = document.getElementById('search');
             const sortBySelect = document.getElementById('sortBy');
             const clearAllButton = document.getElementById('clear-all-btn');
             const undoButton = document.getElementById('undo-btn');
-            const previousDeviceFooter = document.getElementById('previous-device-footer');
-            const previousDeviceText = document.getElementById('previous-device-text');
-            const progressBar = document.getElementById('progress-bar');
+            
             const progressStats = document.getElementById('progress-stats');
+            const progressBar = document.getElementById('progress-bar');
             const completedCount = document.getElementById('completed-count');
+            
             const clearModal = document.getElementById('clear-modal');
             const confirmClearButton = document.getElementById('confirm-clear-btn');
             const cancelClearButton = document.getElementById('cancel-clear-btn');
 
-            let state = {
-                checkedDevices: new Set(),
-                checkHistory: [], // For 'Undo' functionality
-            };
+            const previousDeviceFooter = document.getElementById('previous-device-footer');
+            const previousDeviceText = document.getElementById('previous-device-text');
+
+            // --- APP STATE ---
+            let currentChecklistName = '';
+            let currentDevices = [];
+            let state = { checkedDevices: new Set(), checkHistory: [] };
+
+            // --- FUNCTIONS ---
             
+            const populateChecklistSelectors = () => {
+                if (typeof ALL_CHECKLISTS === 'undefined' || Object.keys(ALL_CHECKLISTS).length === 0) {
+                    buildingListDesktop.innerHTML = '<p class="text-sm text-slate-500">No checklists found in checklists.js</p>';
+                    checklistSelectMobile.innerHTML = '<option>No checklists found</option>';
+                    return;
+                }
+                const checklistNames = Object.keys(ALL_CHECKLISTS);
+                
+                // Populate mobile dropdown
+                checklistSelectMobile.innerHTML = '<option value="">-- Select a Building --</option>' + checklistNames
+                    .map(name => `<option value="${name}">${name}</option>`)
+                    .join('');
+
+                // Populate desktop sidebar
+                buildingListDesktop.innerHTML = checklistNames.map(name => `
+                    <a href="#" data-checklist="${name}" class="building-link flex items-center gap-3 p-3 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <svg class="h-5 w-5 flex-shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v1h1a1 1 0 011 1v1h.5a.5.5 0 00.5-.5V5a.5.5 0 01.5-.5h.5a.5.5 0 01.5.5v.5a.5.5 0 00.5.5H10a1 1 0 011 1v1h1a1 1 0 011 1v1h.5a.5.5 0 00.5-.5V10a.5.5 0 01.5-.5h.5a.5.5 0 01.5.5v.5a.5.5 0 00.5.5H16a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1zm2 8a1 1 0 11-2 0 1 1 0 012 0zm5-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                        <span>${name}</span>
+                    </a>
+                `).join('');
+            };
+
+            const loadChecklist = (checklistName) => {
+                if (!checklistName || !ALL_CHECKLISTS[checklistName]) {
+                    welcomeMessage.classList.remove('hidden');
+                    mainContent.classList.add('hidden');
+                    mainHeader.textContent = "Omni Technologies Checklist Hub";
+                    document.querySelectorAll('.building-link').forEach(link => link.classList.remove('active'));
+                    checklistSelectMobile.value = '';
+                    return;
+                }
+                
+                currentChecklistName = checklistName;
+                currentDevices = ALL_CHECKLISTS[checklistName].devices;
+                
+                mainHeader.textContent = ALL_CHECKLISTS[checklistName].projectName;
+                
+                // Update active state in UI
+                document.querySelectorAll('.building-link').forEach(link => {
+                    link.classList.toggle('active', link.dataset.checklist === checklistName);
+                });
+                checklistSelectMobile.value = checklistName;
+                
+                searchInput.value = '';
+                sortBySelect.value = 'address';
+                
+                loadState();
+                updateUI();
+                filterAndSort();
+
+                welcomeMessage.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            };
+
             const createDeviceCard = (device) => {
                 const uniqueId = `${device.loop}-${device.address}`;
                 const isChecked = state.checkedDevices.has(uniqueId);
                 const checkedClass = isChecked ? 'checked' : '';
                 
-                let badgeText;
-                if (device.loop !== 'N/A') {
-                    badgeText = `Loop ${device.loop} &bull; Addr ${device.address}`;
-                } else {
-                    badgeText = `${device.deviceType} ${device.address}`;
-                }
+                const badgeText = device.loop !== 'N/A' ? `Loop ${device.loop} &bull; Addr ${device.address}` : `${device.deviceType} ${device.address}`;
 
                 return `
-                    <div id="card-${uniqueId}" class="device-card p-4 flex items-center gap-4 relative ${checkedClass}">
-                        <div class="flex-shrink-0">
-                            <input type="checkbox" id="check-${uniqueId}" class="custom-checkbox" ${isChecked ? 'checked' : ''}>
+                    <div id="card-${uniqueId}" class="device-card p-4 flex items-start gap-4 relative rounded-xl shadow-lg border-l-4 dark:border-l-slate-700 bg-white dark:bg-slate-800 ${checkedClass}">
+                        <div class="pt-1">
+                            <input type="checkbox" data-id="${uniqueId}" class="custom-checkbox" ${isChecked ? 'checked' : ''}>
                         </div>
-                        <div class="flex-grow pr-4">
-                            <label for="check-${uniqueId}" class="block cursor-pointer">
-                                <p class="font-semibold text-lg text-slate-800 pr-16">${device.messages}</p>
-                                <div class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-sm text-slate-500">
-                                    <div><span class="font-medium">Model:</span> ${device.model}</div>
-                                    <div class="col-span-2 sm:col-span-1"><span class="font-medium">Type:</span> ${device.deviceType}</div>
-                                    <div class="col-span-2 sm:col-span-3"><span class="font-medium">S/N:</span> ${device.serialNumber}</div>
-                                </div>
-                            </label>
+                        <div class="flex-grow">
+                            <p class="font-bold text-lg text-slate-800 dark:text-white">${device.messages}</p>
+                            <div class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                                <div><span class="font-medium text-slate-700 dark:text-slate-300">Model:</span> ${device.model}</div>
+                                <div class="col-span-2 sm:col-span-1"><span class="font-medium text-slate-700 dark:text-slate-300">Type:</span> ${device.deviceType}</div>
+                                <div class="col-span-3"><span class="font-medium text-slate-700 dark:text-slate-300">S/N:</span> ${device.serialNumber}</div>
+                            </div>
                         </div>
-                        <div class="absolute top-3 right-3 bg-slate-100 text-slate-600 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">
+                        <div class="absolute top-3 right-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">
                            ${badgeText}
                         </div>
                     </div>
@@ -387,22 +293,18 @@
             };
             
             const updateUI = () => {
+                if (currentDevices.length === 0) return;
+
                 const checkedCount = state.checkedDevices.size;
-                const totalCount = devices.length;
+                const totalCount = currentDevices.length;
                 const percentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
                 
-                // Progress Bar
                 progressBar.style.width = `${percentage}%`;
-                progressBar.textContent = `${percentage}%`;
-                progressStats.textContent = `${checkedCount} / ${totalCount} Devices Checked`;
-                
-                // Completed Count Badge
+                progressBar.setAttribute('aria-valuenow', percentage);
+                progressStats.textContent = `${checkedCount} / ${totalCount} Devices Checked (${percentage}%)`;
                 completedCount.textContent = checkedCount;
-
-                // Undo Button State
                 undoButton.disabled = state.checkHistory.length === 0;
 
-                // Footer
                 if (state.checkHistory.length > 0) {
                     const lastCheckedId = state.checkHistory[state.checkHistory.length - 1];
                     const [loop, address] = lastCheckedId.split('-');
@@ -414,45 +316,26 @@
             };
 
             const renderAllLists = (allVisibleDevices) => {
-                const uncheckedHTML = allVisibleDevices
-                    .filter(d => !state.checkedDevices.has(`${d.loop}-${d.address}`))
-                    .map(createDeviceCard)
-                    .join('');
+                const uncheckedHTML = allVisibleDevices.filter(d => !state.checkedDevices.has(`${d.loop}-${d.address}`)).map(createDeviceCard).join('');
+                const checkedHTML = allVisibleDevices.filter(d => state.checkedDevices.has(`${d.loop}-${d.address}`)).sort((a,b) => state.checkHistory.indexOf(`${b.loop}-${b.address}`) - state.checkHistory.indexOf(`${a.loop}-${a.address}`)).map(createDeviceCard).join('');
 
-                const checkedHTML = allVisibleDevices
-                    .filter(d => state.checkedDevices.has(`${d.loop}-${d.address}`))
-                    .sort((a,b) => {
-                         const aIndex = state.checkHistory.indexOf(`${a.loop}-${a.address}`);
-                         const bIndex = state.checkHistory.indexOf(`${b.loop}-${b.address}`);
-                         return bIndex - aIndex; // Sort by last checked
-                    })
-                    .map(createDeviceCard)
-                    .join('');
-
-                deviceListContainer.innerHTML = uncheckedHTML || '<p class="text-slate-500 p-4">All remaining devices are complete!</p>';
-                completedDeviceListContainer.innerHTML = checkedHTML || '<p class="text-slate-500 p-4">No devices checked off yet.</p>';
+                deviceListContainer.innerHTML = uncheckedHTML || '<p class="text-slate-500 dark:text-slate-400 p-4 text-center">All remaining devices are complete!</p>';
+                completedDeviceListContainer.innerHTML = checkedHTML || '<p class="text-slate-500 dark:text-slate-400 p-4 text-center">No devices checked off yet.</p>';
             };
             
             const saveState = () => {
-                const appState = {
-                    checked: Array.from(state.checkedDevices),
-                    history: state.checkHistory
-                };
-                localStorage.setItem('deviceChecklistState', JSON.stringify(appState));
+                if (!currentChecklistName) return;
+                const appState = { checked: Array.from(state.checkedDevices), history: state.checkHistory };
+                localStorage.setItem(`omniChecklist-${currentChecklistName}`, JSON.stringify(appState));
             };
             
             const loadState = () => {
-                const savedState = localStorage.getItem('deviceChecklistState');
-                if (savedState) {
-                    const parsedState = JSON.parse(savedState);
-                    state.checkedDevices = new Set(parsedState.checked || []);
-                    state.checkHistory = parsedState.history || [];
-                }
+                const savedState = localStorage.getItem(`omniChecklist-${currentChecklistName}`);
+                state = savedState ? JSON.parse(savedState) : { checked: [], history: [] };
+                state.checkedDevices = new Set(state.checked);
             };
             
-            const findDevice = (loop, address) => {
-                return devices.find(d => String(d.loop) === String(loop) && String(d.address) === String(address));
-            };
+            const findDevice = (loop, address) => currentDevices.find(d => String(d.loop) === String(loop) && String(d.address) === String(address));
 
             const updatePreviousDeviceFooter = (device) => {
                 if (device) {
@@ -466,69 +349,54 @@
 
             const handleCheck = (e) => {
                 const checkbox = e.target;
-                if (!checkbox.id || !checkbox.id.startsWith('check-')) return;
+                if (!checkbox.matches('.custom-checkbox')) return;
                 
-                const uniqueId = checkbox.id.replace('check-', '');
+                const uniqueId = checkbox.dataset.id;
+                const historyIndex = state.checkHistory.indexOf(uniqueId);
 
                 if (checkbox.checked) {
                     state.checkedDevices.add(uniqueId);
-                    // Add to history only if it's not already there
-                    if (!state.checkHistory.includes(uniqueId)) {
-                        state.checkHistory.push(uniqueId);
-                    }
+                    if (historyIndex === -1) state.checkHistory.push(uniqueId);
                 } else {
                     state.checkedDevices.delete(uniqueId);
-                    // Remove from history if it exists
-                    const historyIndex = state.checkHistory.indexOf(uniqueId);
-                    if (historyIndex > -1) {
-                        state.checkHistory.splice(historyIndex, 1);
-                    }
+                    if (historyIndex > -1) state.checkHistory.splice(historyIndex, 1);
                 }
                 
                 saveState();
                 updateUI();
-                filterAndSort(); // Re-render both lists
+                filterAndSort();
             };
 
             const handleUndo = () => {
                 if (state.checkHistory.length === 0) return;
-
                 const lastCheckedId = state.checkHistory.pop();
                 state.checkedDevices.delete(lastCheckedId);
-
                 saveState();
                 updateUI();
                 filterAndSort();
             };
 
             const filterAndSort = () => {
+                if (currentDevices.length === 0) return;
                 const searchTerm = searchInput.value.toLowerCase();
                 const sortBy = sortBySelect.value;
 
-                let filtered = devices.filter(d => {
+                let filtered = currentDevices.filter(d => {
                     const combinedString = `${d.messages} ${d.model} ${d.deviceType} ${d.serialNumber} ${d.address}`.toLowerCase();
                     return combinedString.includes(searchTerm);
                 });
 
                 filtered.sort((a, b) => {
+                    const valA = (v) => (v === 'N/A' ? Infinity : v);
                     switch (sortBy) {
-                        case 'address':
-                            return a.address - b.address;
-                        case 'address-desc':
-                            return b.address - a.address;
-                        case 'loop':
-                            if (a.loop === 'N/A' && b.loop !== 'N/A') return 1;
-                            if (b.loop === 'N/A' && a.loop !== 'N/A') return -1;
-                            return a.loop - b.loop;
-                        case 'model':
-                            return a.model.localeCompare(b.model);
-                        case 'deviceType':
-                             return a.deviceType.localeCompare(b.deviceType);
-                        default:
-                            return 0;
+                        case 'address': return valA(a.address) - valA(b.address);
+                        case 'address-desc': return valA(b.address) - valA(a.address);
+                        case 'loop': return valA(a.loop) - valA(b.loop);
+                        case 'model': return a.model.localeCompare(b.model);
+                        case 'deviceType': return a.deviceType.localeCompare(b.deviceType);
+                        default: return 0;
                     }
                 });
-
                 renderAllLists(filtered);
             };
             
@@ -551,22 +419,34 @@
                 filterAndSort(); 
                 closeClearModal();
             };
+            
+            // --- Dark Mode ---
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
 
             // --- EVENT LISTENERS ---
+            checklistSelectMobile.addEventListener('change', (e) => loadChecklist(e.target.value));
+            buildingListDesktop.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (link) {
+                    e.preventDefault();
+                    loadChecklist(link.dataset.checklist);
+                }
+            });
+            
             searchInput.addEventListener('input', filterAndSort);
             sortBySelect.addEventListener('change', filterAndSort);
             undoButton.addEventListener('click', handleUndo);
             clearAllButton.addEventListener('click', openClearModal);
             cancelClearButton.addEventListener('click', closeClearModal);
             confirmClearButton.addEventListener('click', handleConfirmClear);
-            
-            document.body.addEventListener('change', handleCheck);
-
+            mainContent.addEventListener('change', handleCheck);
 
             // --- INITIALIZATION ---
-            loadState();
-            updateUI();
-            filterAndSort(); // Initial render
+            populateChecklistSelectors();
         });
     </script>
 </body>
